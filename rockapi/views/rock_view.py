@@ -13,10 +13,22 @@ class RockView(ViewSet):
         """Handle POST operation
         
         Returns:
-            Response -- JSON serialized instance
+            Response -- JSON serialized representation of newly created rock
         """
-        #Implement later
-        return Response("", status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        #Get an object instance of a rock type
+        chosen_type = Type.objects.get(pk=request.data['typeId'])
+
+        #Create a rock object and assign it property values
+        rock = Rock()
+        rock.user = request.auth.user
+        rock.weight = request.data['weight']
+        rock.name = request.data['name']
+        rock.type = chosen_type
+        rock.save()
+
+        serialized = RockSerializer(rock)
+
+        return Response(serialized.data, status=status.HTTP_201_CREATED)
 
     def list(self, request):
         """Handle GET request for all items
